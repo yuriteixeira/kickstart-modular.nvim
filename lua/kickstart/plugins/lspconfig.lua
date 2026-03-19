@@ -135,6 +135,12 @@ return {
 
         stylua = {}, -- Used to format Lua code
 
+        html = {},
+        cssls = {},
+        somesass_ls = {},
+        eslint = {},
+        bashls = {},
+
         -- Special Lua Config, as recommended by neovim help docs
         lua_ls = {
           on_init = function(client)
@@ -159,6 +165,7 @@ return {
               },
             })
           end,
+
           settings = {
             Lua = {},
           },
