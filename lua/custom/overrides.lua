@@ -8,3 +8,9 @@ else
   vim.api.nvim_set_hl(0, 'Visual', { bg = 'gray', fg = 'white', bold = true })
   vim.api.nvim_set_hl(0, 'VisualNOS', { bg = 'gray', fg = 'white', bold = true })
 end
+
+-- Equalize splits on terminal resize
+vim.api.nvim_create_autocmd('VimResized', {
+  command = 'wincmd =',
+})
+
