@@ -1,4 +1,4 @@
-local graphical = os.getenv 'TERM' ~= 'linux'
+local graphical = os.getenv 'TERM' ~= 'linux' or os.getenv 'TERM' ~= 'console'
 
 if graphical then vim.g.have_nerd_font = true end
 
