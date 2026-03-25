@@ -115,6 +115,16 @@ return {
       vim.keymap.set('n', '<leader>fo', builtin.oldfiles, { desc = '[F]ind [Old] Recen Files' })
       vim.keymap.set('n', '<leader>fc', builtin.commands, { desc = '[F]ind [C]ommands' })
       vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>fm', function()
+        local make_entry = require 'telescope.make_entry'
+        local default_maker = make_entry.gen_from_marks {}
+        builtin.marks {
+          entry_maker = function(entry)
+            local mark = entry.line and entry.line:match '^(%a)' or nil
+            if mark then return default_maker(entry) end
+          end,
+        }
+      end, { desc = '[F]ind [M]arks' })
 
       -- This runs on LSP attach per buffer (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info,
       -- it is better explained there). This allows easily switching between pickers if you prefer using something else!
