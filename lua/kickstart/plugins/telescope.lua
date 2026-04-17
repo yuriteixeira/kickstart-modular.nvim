@@ -156,7 +156,7 @@ return {
           -- Jump to the type of the word under your cursor.
           -- Useful when you're not sure what type a variable is and you want to see
           -- the definition of its *type*, not where it was *defined*.
-          vim.keymap.set('n', 'gt', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto to type [D]efinition' })
+          vim.keymap.set('n', 'gD', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto to type [D]efinition' })
         end,
       })
 
