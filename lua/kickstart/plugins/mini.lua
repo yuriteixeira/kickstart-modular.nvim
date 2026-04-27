@@ -26,6 +26,31 @@ return {
       -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
 
+      local default_section_mode = statusline.section_mode
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_mode = function(args)
+        local mode, mode_hl = default_section_mode(args)
+        return mode:upper(), mode_hl
+      end
+
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        desc = 'Keep mini.statusline mode labels bold',
+        group = vim.api.nvim_create_augroup('kickstart-mini-statusline-mode', { clear = true }),
+        callback = function()
+          for _, highlight in ipairs {
+            'MiniStatuslineModeCommand',
+            'MiniStatuslineModeInsert',
+            'MiniStatuslineModeNormal',
+            'MiniStatuslineModeOther',
+            'MiniStatuslineModeReplace',
+            'MiniStatuslineModeVisual',
+          } do
+            vim.api.nvim_set_hl(0, highlight, vim.tbl_extend('force', vim.api.nvim_get_hl(0, { name = highlight, link = false }), { bold = true }))
+          end
+        end,
+      })
+      vim.api.nvim_exec_autocmds('ColorScheme', { group = 'kickstart-mini-statusline-mode' })
+
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
