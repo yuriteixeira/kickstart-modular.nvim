@@ -1,4 +1,4 @@
-# GEMINI.md - Neovim Configuration (Kickstart Modular)
+# Neovim Configuration (Kickstart Modular)
 
 This directory contains a modular Neovim configuration based on [kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim). It is designed to be a starting point that is easy to understand, extend, and customize.
 
