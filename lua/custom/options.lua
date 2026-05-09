@@ -3,6 +3,12 @@ local graphical = os.getenv 'TERM' ~= 'linux' or os.getenv 'TERM' ~= 'console'
 
 if graphical then vim.g.have_nerd_font = true end
 
+vim.filetype.add {
+  extension = {
+    sh = 'bash',
+  },
+}
+
 -- Needed to make it play well with base16 shell themes even in "no gui" console
 vim.o.termguicolors = true
 
