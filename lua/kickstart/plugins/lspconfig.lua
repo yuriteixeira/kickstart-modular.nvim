@@ -137,6 +137,7 @@ return {
 
         html = {},
         cssls = {},
+        svelte = {},
         somesass_ls = {},
         eslint = {},
         bashls = {},
