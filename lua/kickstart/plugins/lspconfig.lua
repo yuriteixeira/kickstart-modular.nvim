@@ -137,6 +137,25 @@ return {
 
         html = {},
         cssls = {},
+        tailwindcss = {
+          filetypes = {
+            'astro',
+            'css',
+            'html',
+            'javascript',
+            'javascriptreact',
+            'svelte',
+            'typescript',
+            'typescriptreact',
+            'vue',
+          },
+          settings = {
+            tailwindCSS = {
+              classAttributes = { 'class', 'className', 'class:list', 'classList', 'ngClass' },
+              validate = true,
+            },
+          },
+        },
         svelte = {},
         somesass_ls = {},
         eslint = {},
