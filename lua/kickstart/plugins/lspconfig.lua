@@ -136,7 +136,25 @@ return {
         stylua = {}, -- Used to format Lua code
 
         html = {},
-        cssls = {},
+        cssls = {
+          settings = {
+            css = {
+              lint = {
+                unknownAtRules = 'ignore',
+              },
+            },
+            scss = {
+              lint = {
+                unknownAtRules = 'ignore',
+              },
+            },
+            less = {
+              lint = {
+                unknownAtRules = 'ignore',
+              },
+            },
+          },
+        },
         tailwindcss = {
           filetypes = {
             'astro',
