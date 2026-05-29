@@ -5,9 +5,17 @@ return {
   'RRethy/base16-nvim',
   dependencies = { 'nvim-treesitter/nvim-treesitter' },
   config = function()
+    local term = os.getenv 'TERM'
+    local console = term == 'linux' or term == 'console'
     local fallback_theme = 'atelier-lakeside'
     local shell_theme = vim.env.BASE16_THEME
-    local theme = shell_theme and shell_theme ~= '' and shell_theme or fallback_theme
+    local theme
+
+    if console then
+      theme = 'linux-vt'
+    else
+      theme = shell_theme and shell_theme ~= '' and shell_theme or fallback_theme
+    end
 
     require('base16-colorscheme').with_config {
       telescope = true,

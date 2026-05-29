@@ -1,5 +1,8 @@
--- Icons and such will show only when a graphical env is up 
-local graphical = os.getenv 'TERM' ~= 'linux' or os.getenv 'TERM' ~= 'console'
+-- Icons and truecolor are useful in graphical terminal emulators, but the Linux
+-- console only has a small color palette and does not render GUI highlights well.
+local term = os.getenv 'TERM'
+local console = term == 'linux' or term == 'console'
+local graphical = not console
 
 if graphical then vim.g.have_nerd_font = true end
 
@@ -9,8 +12,7 @@ vim.filetype.add {
   },
 }
 
--- Needed to make it play well with base16 shell themes even in "no gui" console
-vim.o.termguicolors = true
+vim.o.termguicolors = not console
 
 -- Sane defaults (overridden by .editorconfig when present)
 vim.o.expandtab = true
