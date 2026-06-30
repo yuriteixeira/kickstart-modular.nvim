@@ -17,6 +17,9 @@ vim.api.nvim_create_autocmd('VimResized', {
   command = 'wincmd =',
 })
 
+-- Center the target line after selecting an item from the quickfix/location list.
+require('custom.helpers.quickfix').center_selection_on_open()
+
 local function map_css_class_definition(bufnr)
   vim.keymap.set('n', 'gd', function()
     local css_class_definition = require 'custom.helpers.css-class-definition'
