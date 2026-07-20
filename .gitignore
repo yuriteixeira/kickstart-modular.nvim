@@ -1,6 +1,7 @@
 test.sh
 .luarc.json
 *.log
+lazy-lock.json
 
 # NVIM
 tags
