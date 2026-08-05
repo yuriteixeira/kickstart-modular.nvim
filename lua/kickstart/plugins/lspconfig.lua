@@ -14,7 +14,13 @@ return {
         ---@module 'mason.settings'
         ---@type MasonSettings
         ---@diagnostic disable-next-line: missing-fields
-        opts = {},
+        opts = {
+          -- Any PyPI mirror can lag behind newly published releases. Mason's
+          -- registry may already require a version that the mirror does not expose.
+          pip = {
+            install_args = { '--index-url', 'https://pypi.org/simple/' },
+          },
+        },
       },
       -- Maps LSP server names between nvim-lspconfig and Mason package names.
       'mason-org/mason-lspconfig.nvim',
@@ -124,7 +130,8 @@ return {
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
+        ruff = {},
         -- rust_analyzer = {},
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
