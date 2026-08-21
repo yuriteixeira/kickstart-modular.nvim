@@ -4,6 +4,10 @@ map('n', '<leader>ww', ':w<CR>', { desc = 'File: Save' })
 map('n', '<leader><leader>', ':b#<CR>', { desc = 'Buffers: Toggle current buffer with last opened one' })
 map('n', '<leader>to', '<cmd>Outline<CR>', { desc = 'Toggle: Outline' })
 
+-- [[ Diagnostics ]]
+local diagnostics = require 'custom.helpers.diagnostics'
+map('n', '<leader>td', diagnostics.toggle_inline, { desc = 'Toggle: Inline diagnostics' })
+
 -- [[ Indentation info ]]
 local indent_info = require 'custom.helpers.indent-info'
 vim.api.nvim_create_user_command('IndentInfo', indent_info.show, { desc = 'Show indentation settings and their origin' })
