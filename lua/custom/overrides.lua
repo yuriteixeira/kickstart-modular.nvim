@@ -20,6 +20,14 @@ vim.api.nvim_create_autocmd('VimResized', {
 -- Center the target line after selecting an item from the quickfix/location list.
 require('custom.helpers.quickfix').center_selection_on_open()
 
+local eslint_suppressions = require 'custom.helpers.eslint-suppressions'
+vim.lsp.config('eslint', {
+  handlers = {
+    ['textDocument/diagnostic'] = eslint_suppressions.on_diagnostic,
+    ['textDocument/publishDiagnostics'] = eslint_suppressions.on_publish_diagnostics,
+  },
+})
+
 -- pnpm keeps transitive deps only in `node_modules/.pnpm/node_modules`, which pnpm's own
 -- `.bin` shims expose via NODE_PATH. The eslint language server isn't started through those
 -- shims, so plugins pulled in by shared configs fail
