@@ -1,12 +1,4 @@
--- outline
----@module 'lazy'
----@type LazySpec
-return {
-  'hedyhli/outline.nvim',
-  lazy = false,
-  config = function()
-    require('outline').setup {
-      -- Your setup opts here (leave empty to use defaults)
-    }
-  end,
-}
+vim.pack.add { 'https://github.com/hedyhli/outline.nvim' }
+require('outline').setup {}
+
+-- vim: ts=2 sts=2 sw=2 et

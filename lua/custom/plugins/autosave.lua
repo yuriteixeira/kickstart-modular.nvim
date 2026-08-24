@@ -1,13 +1,6 @@
--- base16-nvim
----@module 'lazy'
----@type LazySpec
-return {
-  'okuuva/auto-save.nvim',
-  version = '^1.0.0',
-  cmd = 'ASToggle',
-  event = { 'InsertLeave', 'TextChanged' }, -- optional for lazy loading on trigger events
-  opts = {
-    -- your config goes here
-    -- or just leave it empty (REQUIRED)
-  },
-}
+local function gh(repo) return 'https://github.com/' .. repo end
+
+vim.pack.add { { src = gh 'okuuva/auto-save.nvim', version = vim.version.range '1.*' } }
+require('auto-save').setup {}
+
+-- vim: ts=2 sts=2 sw=2 et
