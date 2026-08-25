@@ -1,6 +1,11 @@
 local map = vim.keymap.set
 
 map('n', '<leader>ww', ':w<CR>', { desc = 'File: Save' })
+
+local file_path = require 'custom.helpers.file-path'
+vim.api.nvim_create_user_command('FilePath', file_path.copy_relative, { desc = 'Copy relative file path to clipboard' })
+map('n', '<leader>fp', '<cmd>FilePath<CR>', { desc = 'File: Copy relative path' })
+
 map('n', '<leader><leader>', ':b#<CR>', { desc = 'Buffers: Toggle current buffer with last opened one' })
 map('n', '<leader>to', '<cmd>Outline<CR>', { desc = 'Toggle: Outline' })
 
