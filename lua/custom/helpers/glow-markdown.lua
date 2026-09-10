@@ -7,7 +7,7 @@ function M.preview()
 
   local bufnr = vim.api.nvim_get_current_buf()
 
-  vim.cmd('terminal glow -p ' .. tempfile)
+  vim.cmd('terminal glow -s ~/.config/glow/base16.json -p ' .. tempfile)
   vim.cmd 'startinsert!'
 
   -- Cleanup on close
