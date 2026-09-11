@@ -27,3 +27,6 @@ map('n', '<leader>tm', markdown.preview, { desc = 'Toggle: Markdown preview' })
 
 -- [[ QQ command: AI answers streamed to the nvim buffer ]]
 map('n', '<leader>qq', ':QQ ', { desc = 'AI: Quick Question' })
+
+-- [[ Command history ]]
+map('n', '<leader>f;', ':Telescope command_history<CR>', { desc = 'Search command history' })
