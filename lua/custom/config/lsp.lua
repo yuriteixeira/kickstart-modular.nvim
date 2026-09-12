@@ -10,21 +10,21 @@ end
 local function configure_lua(client)
   client.server_capabilities.documentFormattingProvider = false
 
-  if client.workspace_folders then
-    local path = client.workspace_folders[1].name
-    local has_lua_config = vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')
-    if path ~= vim.fn.stdpath 'config' and has_lua_config then return end
-  end
+  local path = client.workspace_folders and client.workspace_folders[1].name
+  local has_lua_config = path and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc'))
+  if path and path ~= vim.fn.stdpath 'config' and has_lua_config then return end
+
+  local workspace = { checkThirdParty = false }
+  -- Only index Neovim's runtime and plugins for the Neovim config itself.
+  -- Including them in every Lua project makes lua_ls scan a large workspace.
+  if path == vim.fn.stdpath 'config' then workspace.library = lua_runtime_library() end
 
   client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua or {}, {
     runtime = {
       version = 'LuaJIT',
       path = { 'lua/?.lua', 'lua/?/init.lua' },
     },
-    workspace = {
-      checkThirdParty = false,
-      library = lua_runtime_library(),
-    },
+    workspace = workspace,
   })
 end
 
