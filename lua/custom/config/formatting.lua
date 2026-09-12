@@ -12,6 +12,8 @@ require('conform').setup {
     zsh = { 'beautysh' },
     bash = { 'beautysh' },
     rust = { 'rustfmt' },
+    kotlin = { 'ktlint' },
+    java = { 'google-java-format' },
   },
 }
 

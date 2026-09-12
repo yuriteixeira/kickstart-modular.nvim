@@ -15,7 +15,6 @@ local plugins = {
   'outline',
   'typescript',
   'zen-mode',
-  'android-dev',
 }
 
 for _, plugin in ipairs(plugins) do

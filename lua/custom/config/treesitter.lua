@@ -7,6 +7,9 @@ local parsers = {
   'svelte',
   'tsx',
   'typescript',
+  'java',
+  'kotlin',
+  'xml',
 }
 
 vim.treesitter.language.register('json', 'jsonl')
