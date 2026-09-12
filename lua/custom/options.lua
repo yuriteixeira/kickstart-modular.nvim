@@ -15,6 +15,9 @@ vim.o.softtabstop = 2
 vim.o.fileencoding = 'utf-8'
 vim.o.scrolloff = 0
 
+-- Treat underscores and dashes as word separators for motions and text objects.
+vim.opt.iskeyword:remove { '_', '-' }
+
 -- Use rounded borders for floating windows such as LSP hover, diagnostics, and popup docs.
 vim.o.winborder = 'rounded'
 
