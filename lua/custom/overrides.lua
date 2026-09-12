@@ -1,5 +1,6 @@
 -- Highlight's tweaking
-local graphical = os.getenv 'TERM' ~= 'linux' or os.getenv 'TERM' ~= 'console'
+local term = os.getenv 'TERM'
+local graphical = term ~= 'linux' and term ~= 'console'
 
 if graphical then
   -- Transparent Bg
