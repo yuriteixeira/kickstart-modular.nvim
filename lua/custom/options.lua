@@ -1,8 +1,3 @@
--- Icons and such will show only when a graphical env is up
-local graphical = os.getenv 'TERM' ~= 'linux' or os.getenv 'TERM' ~= 'console'
-
-if graphical then vim.g.have_nerd_font = true end
-
 vim.filetype.add {
   extension = {
     sh = 'bash',

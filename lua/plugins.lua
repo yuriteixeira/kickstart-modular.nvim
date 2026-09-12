@@ -1,3 +1,7 @@
+-- Load personal values consumed during plugin setup.
+-- ⚠️ IMPORTANT: Keep it while resolving conflicts with upstream!
+require 'custom.bootstrap'
+
 -- Load plugin modules in order.
 
 require 'kickstart.plugins.guess-indent'
