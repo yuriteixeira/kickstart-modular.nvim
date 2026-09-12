@@ -49,9 +49,18 @@ local function configure_kotlin_cache(params)
   })
 end
 
+local function disable_kotlin_document_highlight(client)
+  -- Workaround for https://github.com/fwcd/kotlin-language-server/issues/600.
+  -- The crash protection landed in #612, but is not in Mason's 1.3.13 release;
+  -- track https://github.com/fwcd/kotlin-language-server/issues/671 and remove
+  -- this workaround once a release containing #612 is available.
+  client.server_capabilities.documentHighlightProvider = false
+end
+
 vim.lsp.config('jdtls', {})
 vim.lsp.config('kotlin_language_server', {
   before_init = configure_kotlin_cache,
+  on_init = disable_kotlin_document_highlight,
   cmd_env = kotlin_server_env(),
 })
 
