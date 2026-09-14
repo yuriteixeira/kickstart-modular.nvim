@@ -1,6 +1,6 @@
 local M = {}
 
-local qq_shell_command = 'source "$HOME/.zshrc_helpers"; qq "$@"'
+local qq_shell_command = 'source "$HOME/.zshrc_ai"; qq "$@"'
 
 local handle_stdout
 local handle_stderr

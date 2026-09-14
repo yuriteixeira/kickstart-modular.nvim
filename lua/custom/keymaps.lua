@@ -5,7 +5,8 @@ map('n', '<leader>ww', ':w<CR>', { desc = 'File: Save' })
 map('n', '<leader>to', ':Outline<CR>', { desc = 'Toggle: Outline' })
 
 -- [[ File path ]]
-map('n', '<leader>fp', ':FilePath<CR>', { desc = 'File: Copy relative file path to clipboard' })
+map('n', '<leader>fp', ':RelativeFilePath<CR>', { desc = 'File: Insert relative file path' })
+map('n', '<leader>fP', ':FilePath<CR>', { desc = 'File: Insert absolute file path' })
 
 -- [[ Diagnostics ]]
 local diagnostics = require 'custom.helpers.diagnostics'
@@ -26,7 +27,7 @@ local markdown = require 'custom.helpers.glow-markdown'
 map('n', '<leader>tm', markdown.preview, { desc = 'Toggle: Markdown preview' })
 
 -- [[ QQ command: AI answers streamed to the nvim buffer ]]
-map('n', '<leader>qq', ':QQ ', { desc = 'AI: Quick Question' })
+map('n', '<leader>QQ', ':QQ ', { desc = 'AI: Quick Question' })
 
 -- [[ Command history ]]
 map('n', '<leader>f;', ':Telescope command_history<CR>', { desc = 'Search command history' })
