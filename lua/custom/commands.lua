@@ -9,12 +9,12 @@ cmd('PackUpdate', update_plugins, {
   desc = 'Update plugins managed by vim.pack',
 })
 
-cmd('FilePath', file_path.insert_absolute, {
-  desc = 'Insert the current buffer absolute file path',
+cmd('FilePath', file_path.copy_absolute, {
+  desc = 'Copy the current buffer absolute file path',
 })
 
-cmd('RelativeFilePath', file_path.insert_relative, {
-  desc = 'Insert the current buffer relative file path',
+cmd('RelativeFilePath', file_path.copy_relative, {
+  desc = 'Copy the current buffer relative file path',
 })
 
 cmd('IndentInfo', indent_info.show, {

@@ -11,19 +11,21 @@ local function current_buffer_path()
   return path
 end
 
-function M.insert_absolute()
+function M.copy_absolute()
   local path = current_buffer_path()
   if not path then return end
 
-  vim.api.nvim_put({ path }, 'c', true, true)
+  vim.fn.setreg('+', path)
+  vim.notify('Copied file path: ' .. path)
 end
 
-function M.insert_relative()
+function M.copy_relative()
   local path = current_buffer_path()
   if not path then return end
 
   local relative_path = './' .. vim.fn.fnamemodify(path, ':.')
-  vim.api.nvim_put({ relative_path }, 'c', true, true)
+  vim.fn.setreg('+', relative_path)
+  vim.notify('Copied file path: ' .. relative_path)
 end
 
 return M
