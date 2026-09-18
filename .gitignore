@@ -12,3 +12,5 @@ spell/
 nvim-pack-lock.json
 
 .DS_Store
+
+lua/custom/tools/regrafter/node_modules/

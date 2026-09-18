@@ -1,0 +1,9 @@
+{
+  "name": "nvim-regrafter-bridge",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "regrafter": "0.3.0"
+  }
+}

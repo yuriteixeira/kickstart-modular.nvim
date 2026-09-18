@@ -33,6 +33,7 @@ local configurations = {
   'gitsigns',
   'indent-line',
   'lsp',
+  'regrafter',
   'statusline',
   'telescope',
   'treesitter',
