@@ -1,5 +1,3 @@
 -- Values consumed while Kickstart plugins are being initialized.
-local term = os.getenv 'TERM'
-local graphical = term ~= 'linux' and term ~= 'console'
-
-vim.g.have_nerd_font = graphical
+local terminal = require 'custom.helpers.terminal'
+vim.g.have_nerd_font = terminal.is_graphical

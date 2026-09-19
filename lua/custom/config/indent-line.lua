@@ -1,6 +1,8 @@
-local colors = require('base16-colorscheme').colors
+local ok, base16 = pcall(require, 'base16-colorscheme')
 
-vim.api.nvim_set_hl(0, 'IblIndent', { fg = colors.base01 })
+if (ok) then
+  vim.api.nvim_set_hl(0, 'IblIndent', { fg = base16.colors.base01 })
+end
 
 require('ibl').setup {
   indent = {

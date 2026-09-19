@@ -1,10 +1,17 @@
+local terminal = require 'custom.helpers.terminal'
+
+if terminal.is_console then
+  vim.cmd.colorscheme('default')
+  return
+end
+
 local function gh(repo) return 'https://github.com/' .. repo end
 
 vim.pack.add { gh 'RRethy/base16-nvim' }
 
 local fallback_theme = 'atelier-lakeside'
 local shell_theme = vim.env.BASE16_THEME
-local theme = shell_theme and shell_theme ~= '' and shell_theme or fallback_theme
+local theme = (shell_theme and shell_theme ~= '') and shell_theme or fallback_theme
 
 require('base16-colorscheme').with_config {
   telescope = true,
@@ -21,6 +28,7 @@ require('base16-colorscheme').with_config {
 }
 
 local ok = pcall(vim.cmd.colorscheme, 'base16-' .. theme)
+
 if not ok then
   vim.notify(('base16 theme %q is not available; falling back to %q'):format(theme, fallback_theme), vim.log.levels.WARN)
   vim.cmd.colorscheme('base16-' .. fallback_theme)

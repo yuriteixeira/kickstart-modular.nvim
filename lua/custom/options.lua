@@ -4,8 +4,9 @@ vim.filetype.add {
   },
 }
 
--- Needed to make it play well with base16 shell themes even in "no gui" console
-vim.o.termguicolors = true
+-- The Linux console does not support RGB color sequences.
+local terminal = require 'custom.helpers.terminal'
+vim.o.termguicolors = terminal.is_graphical
 
 -- Sane defaults (overridden by .editorconfig when present)
 vim.o.expandtab = true
