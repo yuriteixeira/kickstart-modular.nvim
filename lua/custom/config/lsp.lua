@@ -134,6 +134,8 @@ local mason_lsp_servers = {
 local mason_tools = {
   'stylua',
   'prettier',
+  -- Provides a compatible tsserver when a project TypeScript package does not.
+  'typescript-language-server',
   'beautysh',
   'ktlint',
   'google-java-format',
@@ -151,7 +153,10 @@ end
 -- Mason is the source of truth for installed LSPs.
 -- Enable them automatically when present.
 require('mason-lspconfig').setup {
-  automatic_enable = true,
+  -- TypeScript Tools owns TypeScript buffers. Mason only supplies its tsserver.
+  automatic_enable = {
+    exclude = { 'ts_ls' },
+  },
 }
 
 -- Guarantees reinstalling everything on a fresh ~/.local/share/nvim installation.
