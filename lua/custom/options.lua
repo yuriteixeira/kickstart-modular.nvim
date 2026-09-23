@@ -22,6 +22,17 @@ vim.opt.iskeyword:append { '_', '-' }
 -- Use rounded borders for floating windows such as LSP hover, diagnostics, and popup docs.
 vim.o.winborder = 'rounded'
 
+-- Check writing against American English and Brazilian Portuguese dictionaries.
+vim.opt.spelllang = { 'en_us', 'pt_br' }
+
+local spell_check_group = vim.api.nvim_create_augroup('custom-spell-check', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
+  group = spell_check_group,
+  pattern = { 'gitcommit', 'markdown', 'text' },
+  command = 'setlocal spell',
+  desc = 'Enable spell checking in writing buffers',
+})
+
 -- Diagnostic Config & Keymaps (:help vim.diagnostic.Opts)
 local diagnostics = require 'custom.helpers.diagnostics'
 

@@ -3,6 +3,7 @@ local map = vim.keymap.set
 map('n', '<leader><leader>', ':b#<CR>', { desc = 'Buffers: Toggle current buffer with last opened one' })
 map('n', '<leader>ww', ':w<CR>', { desc = 'File: Save' })
 map('n', '<leader>to', ':Outline<CR>', { desc = 'Toggle: Outline' })
+map('n', '<leader>ts', '<cmd>setlocal spell!<CR>', { desc = 'Toggle: Spell checking' })
 
 -- [[ File path ]]
 map('n', '<leader>fp', ':RelativeFilePath<CR>', { desc = 'File: Copy relative file path' })
