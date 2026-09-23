@@ -5,6 +5,7 @@ local configurations = {
   'gitsigns',
   'indent-line',
   'lsp',
+  'snippets',
   'statusline',
   'telescope',
   'treesitter',
