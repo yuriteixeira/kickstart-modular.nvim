@@ -1,9 +1,14 @@
 local map = vim.keymap.set
 
+local function toggle_spell_checking()
+  vim.wo.spell = not vim.wo.spell
+  vim.notify('Spell checking ' .. (vim.wo.spell and 'enabled' or 'disabled'))
+end
+
 map('n', '<leader><leader>', ':b#<CR>', { desc = 'Buffers: Toggle current buffer with last opened one' })
 map('n', '<leader>ww', ':w<CR>', { desc = 'File: Save' })
 map('n', '<leader>to', ':Outline<CR>', { desc = 'Toggle: Outline' })
-map('n', '<leader>ts', '<cmd>setlocal spell!<CR>', { desc = 'Toggle: Spell checking' })
+map('n', '<leader>ts', toggle_spell_checking, { desc = 'Toggle: Spell checking' })
 
 -- [[ File path ]]
 map('n', '<leader>fp', ':RelativeFilePath<CR>', { desc = 'File: Copy relative file path' })
