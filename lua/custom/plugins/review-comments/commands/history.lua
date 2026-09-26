@@ -1,6 +1,11 @@
 local storage = require 'custom.plugins.review-comments.storage'
 local state = require 'custom.plugins.review-comments.state'
 local list = require 'custom.plugins.review-comments.commands.list'
+local pickers = require 'telescope.pickers'
+local finders = require 'telescope.finders'
+local actions = require 'telescope.actions'
+local action_state = require 'telescope.actions.state'
+local conf = require('telescope.config').values
 
 local function label(session)
   local name = vim.fn.fnamemodify(session.path, ':t')
@@ -21,7 +26,51 @@ local function newest_first(a, b)
   return a.path > b.path
 end
 
-return function()
+local show_history
+
+local function confirm_delete(session)
+  local name = vim.fn.fnamemodify(session.path, ':t')
+  vim.ui.select({ 'Cancel', 'Delete' }, { prompt = 'Delete review session ' .. name .. '?' }, function(choice)
+    if choice ~= 'Delete' then return show_history() end
+    local ok, err = pcall(storage.delete_session, session.path)
+    if not ok then state.notify(err, vim.log.levels.ERROR) else state.notify('Deleted review session ' .. name) end
+    show_history()
+  end)
+end
+
+local function delete_selection(prompt_bufnr)
+  local entry = action_state.get_selected_entry()
+  if not entry then return end
+  local session = entry.value
+  if session.path == storage.path() then return state.notify('Cannot delete the active review session', vim.log.levels.WARN) end
+  actions.close(prompt_bufnr)
+  confirm_delete(session)
+end
+
+local function select_session(prompt_bufnr)
+  local entry = action_state.get_selected_entry()
+  actions.close(prompt_bufnr)
+  if entry then open_session(entry.value) end
+end
+
+local function make_entry(session)
+  return { value = session, display = label(session), ordinal = label(session) }
+end
+
+local function open_picker(sessions)
+  pickers.new({}, {
+    prompt_title = 'Review sessions (Ctrl-D: delete)',
+    finder = finders.new_table { results = sessions, entry_maker = make_entry },
+    sorter = conf.generic_sorter {},
+    attach_mappings = function(prompt_bufnr, map)
+      actions.select_default:replace(select_session)
+      map({ 'i', 'n' }, '<C-d>', delete_selection)
+      return true
+    end,
+  }):find()
+end
+
+show_history = function()
   if #state.comments > 0 or vim.fn.filereadable(storage.path()) == 1 then state.flush() end
   local sessions = {}
   for _, path in ipairs(storage.sessions()) do
@@ -31,5 +80,7 @@ return function()
   end
   if #sessions == 0 then return state.notify('No saved review sessions') end
   table.sort(sessions, newest_first)
-  vim.ui.select(sessions, { prompt = 'Review sessions', format_item = label }, open_session)
+  open_picker(sessions)
 end
+
+return show_history

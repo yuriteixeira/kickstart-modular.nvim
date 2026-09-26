@@ -57,6 +57,13 @@ function M.directory() return directory end
 function M.root() return cwd end
 function M.new_path(alias) return new_path(alias) end
 
+function M.delete_session(selected)
+  if selected == path then error('Cannot delete the active review session') end
+  if not vim.tbl_contains(M.sessions(), selected) then error('Review session file not found: ' .. selected) end
+  local ok, err = vim.uv.fs_unlink(selected)
+  if not ok then error('Cannot delete review session: ' .. selected .. ': ' .. tostring(err)) end
+end
+
 function M.clear_store()
   local files = M.sessions()
   vim.list_extend(files, vim.fn.globpath(directory, '*.active', false, true))
