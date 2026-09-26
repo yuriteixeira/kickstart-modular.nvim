@@ -211,6 +211,22 @@ function M.show()
   end)
 end
 
+function M.overview()
+  local seen = {}
+  local paths = {}
+  for _, comment in ipairs(comments) do
+    if not seen[comment.path] then
+      seen[comment.path] = true
+      paths[#paths + 1] = comment.path
+    end
+  end
+  if #paths == 0 then return notify('No review comments') end
+  table.sort(paths)
+  vim.ui.select(paths, { prompt = 'Files with review comments', format_item = display_path }, function(path)
+    if path then vim.cmd.edit(vim.fn.fnameescape(path)) end
+  end)
+end
+
 function M.list()
   if #comments == 0 then return notify('No review comments') end
   vim.ui.select(comments, {
