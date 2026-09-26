@@ -4,7 +4,8 @@ local cwd = vim.fn.getcwd()
 local directory = vim.fn.stdpath 'data' .. '/review-comments'
 local name = vim.fn.fnamemodify(cwd, ':t')
 local root_hash = vim.fn.sha256(cwd):sub(1, 12)
-local active_file = directory .. '/' .. root_hash .. '.active'
+local active_file = directory .. '/' .. name:lower():gsub('[^%w_-]+', '-') .. '-' .. root_hash .. '.active'
+local legacy_active_file = directory .. '/' .. root_hash .. '.active'
 local path
 
 local function new_path(alias)
@@ -25,9 +26,13 @@ function M.sessions()
 end
 
 local function startup_path()
-  if vim.fn.filereadable(active_file) == 1 then
-    local chosen = vim.fn.readfile(active_file)[1]
-    if chosen and vim.fn.filereadable(chosen) == 1 then return chosen end
+  for _, file in ipairs { active_file, legacy_active_file } do
+    if vim.fn.filereadable(file) == 1 then
+      local chosen = vim.fn.readfile(file)[1]
+      if chosen and (vim.fn.filereadable(chosen) == 1 or (chosen:sub(1, #directory + 1) == directory .. '/' and chosen:match '%.json$')) then
+        return chosen
+      end
+    end
   end
 
   local newest, newest_time
@@ -93,6 +98,7 @@ end
 
 function M.save(comments, selected)
   selected = selected or path
+  if #comments == 0 and vim.fn.filereadable(selected) == 0 then return end
   vim.fn.mkdir(vim.fn.fnamemodify(selected, ':h'), 'p')
   local temp = selected .. '.' .. vim.fn.getpid() .. '.tmp'
   local ok, err = pcall(vim.fn.writefile, { vim.json.encode { comments = comments } }, temp)
