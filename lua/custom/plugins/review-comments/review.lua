@@ -245,8 +245,8 @@ end
 function M.markdown()
   sync_lines()
   local lines = {
-    '## Session: ' .. storage.path(), '',
-    'Here are some comments from my review that I want to be addressed:', '',
+    '## Session: `' .. storage.path() .. '`', '',
+    'Address my following comments:', '',
   }
   for index, comment in ipairs(comments) do
     local prefix = index .. '. `' .. anchor(comment) .. '`'
