@@ -165,157 +165,44 @@ local function editor(initial, line, end_line, on_save)
   vim.keymap.set('n', 'q', function() vim.api.nvim_win_close(win, true) end, { buffer = buf })
 end
 
-function M.add(scope, start_line, end_line)
-  local path = buffer_path(0)
-  if not path then return notify('Open a file buffer to add a comment', vim.log.levels.WARN) end
-  local line
-  if scope ~= 'file' then line = start_line or vim.api.nvim_win_get_cursor(0)[1] end
-  local last = line and end_line and end_line > line and end_line or nil
-  editor(nil, line, last, function(text)
-    next_id = next_id + 1
-    comments[#comments + 1] = {
-      id = next_id, path = path, line = line, end_line = last,
-      commit = commit_for(path, line), text = text,
-    }
-    save()
-    render_all()
-  end)
+function M.add_comment(path, line, end_line, text)
+  next_id = next_id + 1
+  comments[#comments + 1] = {
+    id = next_id, path = path, line = line, end_line = end_line,
+    commit = commit_for(path, line), text = text,
+  }
+  save()
+  render_all()
 end
 
-function M.edit()
-  choose_here(function(comment)
-    if not comment then return end
-    sync_lines()
-    editor(comment.text, locate(comment), comment.end_line, function(text)
-      comment.text = text
-      save()
-      render_all()
-    end)
-  end)
-end
-
-function M.delete()
-  choose_here(function(comment)
-    if not comment then return end
-    for index, item in ipairs(comments) do
-      if item == comment then table.remove(comments, index); break end
-    end
-    save()
-    render_all()
-  end)
-end
-
-function M.show()
-  choose_here(function(comment)
-    if comment then notify(comment.text .. (comment.commit and ' (commit ' .. comment.commit .. ')' or '')) end
-  end)
-end
-
-function M.overview()
-  local seen = {}
-  local paths = {}
-  for _, comment in ipairs(comments) do
-    if not seen[comment.path] then
-      seen[comment.path] = true
-      paths[#paths + 1] = comment.path
-    end
+function M.remove_comment(comment)
+  for index, item in ipairs(comments) do
+    if item == comment then table.remove(comments, index); break end
   end
-  if #paths == 0 then return notify('No review comments') end
-  table.sort(paths)
-  vim.ui.select(paths, { prompt = 'Files with review comments', format_item = display_path }, function(path)
-    if path then vim.cmd.edit(vim.fn.fnameescape(path)) end
-  end)
+  save()
+  render_all()
 end
 
-function M.list()
-  if #comments == 0 then return notify('No review comments') end
-  vim.ui.select(comments, {
-    prompt = 'Review comments',
-    format_item = function(item)
-      return display_path(item.path) .. (item.line and ':' .. (locate(item) or item.line) or '') .. ' - ' .. item.text:gsub('\n', ' ')
-    end,
-  }, function(item)
-    if not item then return end
-    vim.cmd.edit(vim.fn.fnameescape(item.path))
-    if item.line then vim.api.nvim_win_set_cursor(0, { math.min(locate(item) or item.line, vim.api.nvim_buf_line_count(0)), 0 }) end
-    notify(item.text)
-  end)
+function M.update_comment(comment, text)
+  comment.text = text
+  save()
+  render_all()
 end
 
-local function navigate(direction)
-  local path = buffer_path(0)
-  if not path then return notify('Open a file buffer to navigate comments', vim.log.levels.WARN) end
+M.comments = comments
+M.notify = notify
+M.buffer_path = buffer_path
+M.display_path = display_path
+M.locate = locate
+M.sync_lines = sync_lines
+M.choose_here = choose_here
+M.editor = editor
+M.render_all = render_all
 
-  local lines = {}
-  local last_line = vim.api.nvim_buf_line_count(0)
-  for _, comment in ipairs(comments) do
-    if comment.path == path then
-      lines[#lines + 1] = math.min(locate(comment) or 1, last_line)
-    end
-  end
-  if #lines == 0 then return notify('No review comments in this file', vim.log.levels.WARN) end
-
-  table.sort(lines)
-  local current = vim.api.nvim_win_get_cursor(0)[1]
-  if direction == 1 then
-    for _, line in ipairs(lines) do
-      if line > current then return vim.api.nvim_win_set_cursor(0, { line, 0 }) end
-    end
-    return vim.api.nvim_win_set_cursor(0, { lines[1], 0 })
-  end
-  for index = #lines, 1, -1 do
-    if lines[index] < current then return vim.api.nvim_win_set_cursor(0, { lines[index], 0 }) end
-  end
-  vim.api.nvim_win_set_cursor(0, { lines[#lines], 0 })
-end
-
-function M.next() navigate(1) end
-function M.previous() navigate(-1) end
-
-function M.toggle()
+function M.toggle_inline()
   inline_visible = not inline_visible
   render_all()
   notify('Inline comments ' .. (inline_visible and 'shown' or 'hidden'))
-end
-
-local function anchor(comment)
-  local result = display_path(comment.path)
-  local first = locate(comment) or comment.line
-  if first then
-    result = result .. ':~' .. first
-    if comment.end_line and comment.end_line > first then result = result .. '-~' .. comment.end_line end
-  end
-  return result
-end
-
-function M.markdown()
-  sync_lines()
-  local lines = {
-    '## Session: `' .. storage.path() .. '`', '',
-    'Address my following comments:', '',
-  }
-  for index, comment in ipairs(comments) do
-    local prefix = index .. '. `' .. anchor(comment) .. '`'
-    if comment.commit then prefix = prefix .. ' (commit ' .. comment.commit .. ')' end
-    local parts = vim.split(comment.text, '\n', { plain = true })
-    lines[#lines + 1] = prefix .. ' - ' .. parts[1]
-    for part = 2, #parts do lines[#lines + 1] = '   ' .. parts[part] end
-  end
-  return table.concat(lines, '\n') .. '\n'
-end
-
-function M.copy()
-  vim.fn.setreg('+', M.markdown())
-  notify('Review copied to system clipboard')
-end
-
-function M.export(path)
-  if not path or path == '' then return notify('Provide an output path', vim.log.levels.WARN) end
-  path = vim.fn.fnamemodify(path, ':p')
-  if vim.fn.filereadable(path) == 1 then return notify('File already exists: ' .. path, vim.log.levels.ERROR) end
-  local ok, err = pcall(vim.fn.writefile, vim.split(M.markdown(), '\n', { plain = true, trimempty = true }), path)
-  if not ok then return notify('Export failed: ' .. tostring(err), vim.log.levels.ERROR) end
-  notify('Review written to ' .. path)
 end
 
 function M.attach(buf)
