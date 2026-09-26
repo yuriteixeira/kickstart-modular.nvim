@@ -50,6 +50,7 @@ local function commit_for(path, line)
 end
 
 local function locate(comment)
+  if not comment.line then return nil end
   local buf = vim.fn.bufnr(comment.path)
   if buf ~= -1 and vim.api.nvim_buf_is_loaded(buf) and comment.mark then
     local position = vim.api.nvim_buf_get_extmark_by_id(buf, ns, comment.mark, {})
@@ -116,13 +117,14 @@ local function render(buf)
   local count = vim.api.nvim_buf_line_count(buf)
   if count == 0 then return end
   for _, comment in ipairs(comments) do
-    if comment.path == path and comment.line then
-      local line = math.min(math.max(comment.line, 1), count)
+    if comment.path == path then
+      local line = math.min(math.max(comment.line or 1, 1), count)
       local preview = comment.text:gsub('\n', ' ')
       if #preview > 90 then preview = preview:sub(1, 87) .. '...' end
       local options = {
-        sign_text = '◆',
+        sign_text = comment.line and '◆' or '◇',
         sign_hl_group = 'DiagnosticSignInfo',
+        priority = comment.line and 20 or 10,
         right_gravity = true,
       }
       if inline_visible then
