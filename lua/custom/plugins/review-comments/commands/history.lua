@@ -14,6 +14,13 @@ local function open_session(session)
   if session then list(session.comments, 'Review comments in ' .. vim.fn.fnamemodify(session.path, ':t')) end
 end
 
+local function newest_first(a, b)
+  local a_time = a.path:match('%-(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)%-%d+%-?%d*%.json$') or ''
+  local b_time = b.path:match('%-(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)%-%d+%-?%d*%.json$') or ''
+  if a_time ~= b_time then return a_time > b_time end
+  return a.path > b.path
+end
+
 return function()
   if #state.comments > 0 or vim.fn.filereadable(storage.path()) == 1 then state.flush() end
   local sessions = {}
@@ -23,5 +30,6 @@ return function()
     sessions[#sessions + 1] = { path = path, comments = comments }
   end
   if #sessions == 0 then return state.notify('No saved review sessions') end
+  table.sort(sessions, newest_first)
   vim.ui.select(sessions, { prompt = 'Review sessions', format_item = label }, open_session)
 end
