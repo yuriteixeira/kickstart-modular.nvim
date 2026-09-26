@@ -18,6 +18,7 @@ command('ReviewCommentEdit', action('edit'), { desc = 'Edit a review comment at 
 command('ReviewCommentDelete', action('delete'), { desc = 'Delete a review comment at the cursor' })
 command('ReviewCommentList', function() action('list')() end, { desc = 'Browse review comments' })
 command('ReviewCommentHistory', action('history'), { desc = 'Browse saved review sessions and jump to comments' })
+command('ReviewCommentsJoinSession', action('join-session'), { desc = 'Create or join a review session' })
 command('ReviewCommentOverview', action('overview'), { desc = 'Browse files with review comments in this session' })
 command('ReviewCommentNext', action('next'), { desc = 'Jump to the next review comment in this file' })
 command('ReviewCommentPrevious', action('previous'), { desc = 'Jump to the previous review comment in this file' })

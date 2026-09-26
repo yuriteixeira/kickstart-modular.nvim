@@ -222,6 +222,36 @@ function M.update_comment(comment, text)
   render_all()
 end
 
+function M.join_session(path, move)
+  if path == storage.path() then return end
+  sync_lines()
+  storage.save(comments)
+  local selected = storage.load(path)
+  if move then
+    local highest = 0
+    for _, comment in ipairs(selected) do highest = math.max(highest, tonumber(comment.id) or 0) end
+    for _, comment in ipairs(comments) do
+      highest = highest + 1
+      local copy = vim.deepcopy(comment)
+      copy.id, copy.mark, copy.end_mark = highest, nil, nil
+      selected[#selected + 1] = copy
+    end
+  end
+  storage.save(selected, path)
+  local previous = storage.path()
+  storage.set_path(path)
+  if move then storage.save({}, previous) end
+  comments = selected
+  M.comments = comments
+  stale_comments = {}
+  next_id = 0
+  for _, comment in ipairs(comments) do
+    next_id = math.max(next_id, tonumber(comment.id) or 0)
+    comment.mark, comment.end_mark = nil, nil
+  end
+  render_all()
+end
+
 M.comments = comments
 M.notify = notify
 M.buffer_path = buffer_path
