@@ -45,7 +45,12 @@ local reviewCommentsAutoCmdGroup = vim.api.nvim_create_augroup('ReviewComments',
 
 vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile', 'BufEnter' }, {
   group = reviewCommentsAutoCmdGroup,
-  callback = function(args) state.attach(args.buf) end,
+  callback = function(args) state.attach(args.buf, args.event == 'BufReadPost') end,
+})
+
+vim.api.nvim_create_autocmd('BufWritePost', {
+  group = reviewCommentsAutoCmdGroup,
+  callback = function(args) state.capture_saved_anchors(args.buf) end,
 })
 
 vim.api.nvim_create_autocmd({ 'TextChanged', 'TextChangedI', 'BufLeave', 'VimLeavePre' }, {

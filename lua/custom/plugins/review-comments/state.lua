@@ -4,6 +4,7 @@ local M = {}
 local ns = vim.api.nvim_create_namespace 'custom_review_comments'
 local comments = storage.load()
 local inline_visible = true
+local stale_comments = {}
 local next_id = 0
 
 for _, comment in ipairs(comments) do
@@ -70,6 +71,34 @@ local function sync_lines()
         end
       end
     end
+  end
+end
+
+local function anchor_text(buf, line)
+  if not line or line < 1 or line > vim.api.nvim_buf_line_count(buf) then return nil end
+  return vim.api.nvim_buf_get_lines(buf, line - 1, line, false)[1]
+end
+
+local function capture_anchor(comment, buf)
+  if not comment.line then return end
+  local first = anchor_text(buf, locate(comment))
+  if not first then return end
+  local last = comment.end_line and anchor_text(buf, comment.end_line) or nil
+  comment.anchor = { first = first, last = last }
+end
+
+local function check_anchors(buf, path)
+  local stale = {}
+  for _, comment in ipairs(comments) do
+    if comment.path == path and comment.anchor and comment.line then
+      local first = anchor_text(buf, comment.line)
+      local last = comment.end_line and anchor_text(buf, comment.end_line) or nil
+      stale_comments[comment] = first ~= comment.anchor.first or (comment.end_line and last ~= comment.anchor.last)
+      if stale_comments[comment] then stale[#stale + 1] = tostring(comment.line) end
+    end
+  end
+  if #stale > 0 then
+    notify('Review comment text changed in ' .. display_path(path) .. ' at line(s) ' .. table.concat(stale, ', ') .. '. Check their locations.', vim.log.levels.WARN)
   end
 end
 
@@ -171,6 +200,9 @@ function M.add_comment(path, line, end_line, text)
     id = next_id, path = path, line = line, end_line = end_line,
     commit = commit_for(path, line), text = text,
   }
+  local comment = comments[#comments]
+  local buf = vim.fn.bufnr(path)
+  if buf ~= -1 and vim.api.nvim_buf_is_loaded(buf) then capture_anchor(comment, buf) end
   save()
   render_all()
 end
@@ -179,6 +211,7 @@ function M.remove_comment(comment)
   for index, item in ipairs(comments) do
     if item == comment then table.remove(comments, index); break end
   end
+  stale_comments[comment] = nil
   save()
   render_all()
 end
@@ -205,8 +238,31 @@ function M.toggle_inline()
   notify('Inline comments ' .. (inline_visible and 'shown' or 'hidden'))
 end
 
-function M.attach(buf)
-  if buffer_path(buf) then render(buf) end
+function M.attach(buf, check_on_reload)
+  local path = buffer_path(buf)
+  if not path then return end
+  local has_marks = false
+  for _, comment in ipairs(comments) do
+    if comment.path == path and comment.mark then
+      local position = vim.api.nvim_buf_get_extmark_by_id(buf, ns, comment.mark, {})
+      if #position > 0 then has_marks = true; break end
+    end
+  end
+  if check_on_reload or not has_marks then check_anchors(buf, path) end
+  render(buf)
+end
+
+function M.capture_saved_anchors(buf)
+  local path = buffer_path(buf)
+  if not path then return end
+  sync_lines()
+  for _, comment in ipairs(comments) do
+    if comment.path == path and comment.anchor and comment.mark and not stale_comments[comment] then
+      local position = vim.api.nvim_buf_get_extmark_by_id(buf, ns, comment.mark, {})
+      if #position > 0 then capture_anchor(comment, buf) end
+    end
+  end
+  save()
 end
 
 function M.flush() save() end
