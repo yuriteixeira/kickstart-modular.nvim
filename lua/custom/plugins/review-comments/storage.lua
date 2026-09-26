@@ -48,6 +48,7 @@ end
 path = startup_path()
 
 function M.path() return path end
+function M.directory() return directory end
 function M.root() return cwd end
 function M.new_path(alias) return new_path(alias) end
 

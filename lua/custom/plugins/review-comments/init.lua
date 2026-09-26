@@ -20,6 +20,7 @@ command('ReviewCommentList', function() action('list')() end, { desc = 'Browse r
 command('ReviewCommentHistory', action('history'), { desc = 'Browse saved review sessions and jump to comments' })
 command('ReviewCommentJoinSession', action('join-session'), { desc = 'Create or join a review session' })
 command('ReviewCommentCurrentSession', action('current-session'), { desc = 'Show the current review session name' })
+command('ReviewCommentStorePath', action('store-path'), { desc = 'Show and copy the review session store directory' })
 command('ReviewCommentOverview', action('overview'), { desc = 'Browse files with review comments in this session' })
 command('ReviewCommentNext', action('next'), { desc = 'Jump to the next review comment in this file' })
 command('ReviewCommentPrevious', action('previous'), { desc = 'Jump to the previous review comment in this file' })
