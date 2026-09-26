@@ -143,6 +143,7 @@ local function render_all()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) then render(buf) end
   end
+  vim.cmd.redrawstatus()
 end
 
 local function review_at_cursor()
@@ -250,6 +251,15 @@ function M.join_session(path, move)
     comment.mark, comment.end_mark = nil, nil
   end
   render_all()
+end
+
+function M.has_comments(buf)
+  local path = buffer_path(buf)
+  if not path then return false end
+  for _, comment in ipairs(comments) do
+    if comment.path == path then return true end
+  end
+  return false
 end
 
 M.comments = comments

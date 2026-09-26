@@ -1,6 +1,9 @@
 local statusline = require 'mini.statusline'
 local terminal = require 'custom.helpers.terminal'
 local default_section_mode = statusline.section_mode
+local default_section_filename = statusline.section_filename
+local review_state = require 'custom.plugins.review-comments.state'
+local review_storage = require 'custom.plugins.review-comments.storage'
 
 local function uppercase_mode(args)
   local mode, mode_highlight = default_section_mode(args)
@@ -8,6 +11,13 @@ local function uppercase_mode(args)
 end
 
 statusline.section_mode = uppercase_mode
+
+statusline.section_filename = function(args)
+  local filename = default_section_filename(args)
+  if not review_state.has_comments(0) then return filename end
+  local session = vim.fn.fnamemodify(review_storage.path(), ':t'):gsub('%%', '%%%%')
+  return filename .. ' | Review: ' .. session
+end
 
 if not terminal.is_console then return end
 
