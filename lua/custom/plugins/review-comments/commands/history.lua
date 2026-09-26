@@ -20,6 +20,8 @@ local function open_session(session)
 end
 
 local function newest_first(a, b)
+  local current = storage.path()
+  if a.path == current or b.path == current then return a.path == current and b.path ~= current end
   local a_time = a.path:match('%-(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)%-%d+%-?%d*%.json$') or ''
   local b_time = b.path:match('%-(%d%d%d%d%d%d%d%d%-%d%d%d%d%d%d)%-%d+%-?%d*%.json$') or ''
   if a_time ~= b_time then return a_time > b_time end
