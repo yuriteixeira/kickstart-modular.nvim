@@ -134,7 +134,15 @@ local function choose_here(callback)
   vim.ui.select(matches, { prompt = 'Choose review comment', format_item = function(item) return item.text end }, callback)
 end
 
-local function editor(initial, on_save)
+local function dialog_title(line, end_line)
+  local location = 'Comment'
+  if line then
+    location = end_line and end_line > line and ('Comment on Range ' .. line .. '-' .. end_line) or ('Comment on Line ' .. line)
+  end
+  return ' ' .. location .. '  (Ctrl-S save, q cancel) '
+end
+
+local function editor(initial, line, end_line, on_save)
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = 'wipe'
   vim.bo[buf].filetype = 'markdown'
@@ -145,7 +153,7 @@ local function editor(initial, on_save)
     relative = 'editor', style = 'minimal', border = 'rounded',
     width = width, height = height,
     row = math.floor((vim.o.lines - height) / 2), col = math.floor((vim.o.columns - width) / 2),
-    title = ' Comment  (Ctrl-S save, q cancel) ',
+    title = dialog_title(line, end_line),
   })
   vim.keymap.set({ 'n', 'i' }, '<C-s>', function()
     local text = vim.trim(table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), '\n'))
@@ -162,7 +170,7 @@ function M.add(scope, start_line, end_line)
   local line
   if scope ~= 'file' then line = start_line or vim.api.nvim_win_get_cursor(0)[1] end
   local last = line and end_line and end_line > line and end_line or nil
-  editor(nil, function(text)
+  editor(nil, line, last, function(text)
     next_id = next_id + 1
     comments[#comments + 1] = {
       id = next_id, path = path, line = line, end_line = last,
@@ -176,7 +184,8 @@ end
 function M.edit()
   choose_here(function(comment)
     if not comment then return end
-    editor(comment.text, function(text)
+    sync_lines()
+    editor(comment.text, locate(comment), comment.end_line, function(text)
       comment.text = text
       save()
       render_all()
