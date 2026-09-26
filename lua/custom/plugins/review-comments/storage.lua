@@ -52,6 +52,16 @@ function M.directory() return directory end
 function M.root() return cwd end
 function M.new_path(alias) return new_path(alias) end
 
+function M.clear_store()
+  local files = M.sessions()
+  vim.list_extend(files, vim.fn.globpath(directory, '*.active', false, true))
+  for _, file in ipairs(files) do
+    local ok, err = vim.uv.fs_unlink(file)
+    if not ok then error('Cannot remove review store file: ' .. file .. ': ' .. tostring(err)) end
+  end
+  path = new_path(name:lower():gsub('[^%w_-]+', '-'))
+end
+
 local function remember(selected)
   vim.fn.mkdir(directory, 'p')
   local temp = active_file .. '.' .. vim.fn.getpid() .. '.tmp'

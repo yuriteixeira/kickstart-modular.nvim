@@ -217,6 +217,36 @@ function M.remove_comment(comment)
   render_all()
 end
 
+local function replace_comments(remaining)
+  storage.save(remaining)
+  comments = remaining
+  M.comments = comments
+  stale_comments = {}
+  render_all()
+end
+
+function M.clear_file(path)
+  sync_lines()
+  local remaining = {}
+  for _, comment in ipairs(comments) do
+    if comment.path ~= path then remaining[#remaining + 1] = comment end
+  end
+  replace_comments(remaining)
+end
+
+function M.clear_session()
+  replace_comments({})
+end
+
+function M.clear_store()
+  storage.clear_store()
+  comments = {}
+  M.comments = comments
+  stale_comments = {}
+  next_id = 0
+  render_all()
+end
+
 function M.update_comment(comment, text)
   comment.text = text
   save()
