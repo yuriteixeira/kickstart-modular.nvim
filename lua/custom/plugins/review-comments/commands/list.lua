@@ -1,9 +1,10 @@
 local state = require 'custom.plugins.review-comments.state'
 
-return function()
-  if #state.comments == 0 then return state.notify('No review comments') end
-  vim.ui.select(state.comments, {
-    prompt = 'Review comments',
+return function(comments, prompt)
+  comments = type(comments) == 'table' and comments or state.comments
+  if #comments == 0 then return state.notify('No review comments') end
+  vim.ui.select(comments, {
+    prompt = prompt or 'Review comments',
     format_item = function(item)
       return state.display_path(item.path) .. (item.line and ':' .. (state.locate(item) or item.line) or '') .. ' - ' .. item.text:gsub('\n', ' ')
     end,

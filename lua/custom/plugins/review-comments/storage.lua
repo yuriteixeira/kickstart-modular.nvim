@@ -9,8 +9,14 @@ local function session_path() return path end
 function M.path() return session_path() end
 function M.root() return cwd end
 
-function M.load()
-  local path = session_path()
+function M.sessions()
+  local paths = vim.fn.globpath(directory, '*.json', false, true)
+  table.sort(paths)
+  return paths
+end
+
+function M.load(path)
+  path = path or session_path()
   if vim.fn.filereadable(path) == 0 then return {} end
   local ok, lines = pcall(vim.fn.readfile, path)
   if not ok then error('Cannot read review comments: ' .. path) end
