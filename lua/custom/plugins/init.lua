@@ -6,6 +6,7 @@ local plugins = {
   'marks',
   'nvim-ts-autotag',
   'outline',
+  'review-comments',
   'typescript',
   'zen-mode',
 }
