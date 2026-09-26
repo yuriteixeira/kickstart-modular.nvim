@@ -79,12 +79,13 @@ local function save()
 end
 
 local function render(buf)
-  if not vim.api.nvim_buf_is_valid(buf) then return end
+  if not vim.api.nvim_buf_is_valid(buf) or not vim.api.nvim_buf_is_loaded(buf) then return end
   sync_lines()
   vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
   local path = buffer_path(buf)
   if not path then return end
   local count = vim.api.nvim_buf_line_count(buf)
+  if count == 0 then return end
   for _, comment in ipairs(comments) do
     if comment.path == path and comment.line then
       local line = math.min(math.max(comment.line, 1), count)
