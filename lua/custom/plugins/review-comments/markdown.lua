@@ -5,13 +5,13 @@ local function anchor(comment)
   local result = state.display_path(comment.path)
   local first = state.locate(comment) or comment.line
   if first then
-    result = result .. ':' .. first
-    if comment.start_col then result = result .. ':' .. comment.start_col end
+    result = result .. ':L' .. first
+    if comment.start_col then result = result .. ':C' .. comment.start_col end
     if comment.end_line and comment.end_line > first then
-      result = result .. '-' .. comment.end_line
-      if comment.end_col then result = result .. ':' .. comment.end_col end
+      result = result .. '-L' .. comment.end_line
+      if comment.end_col then result = result .. ':C' .. comment.end_col end
     elseif comment.end_col and comment.end_col ~= comment.start_col then
-      result = result .. '-' .. first .. ':' .. comment.end_col
+      result = result .. '-L' .. first .. ':C' .. comment.end_col
     end
   end
   return result
