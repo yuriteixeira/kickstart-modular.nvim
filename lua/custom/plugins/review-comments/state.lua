@@ -153,12 +153,8 @@ local function review_at_cursor()
   local line = vim.api.nvim_win_get_cursor(0)[1]
   local matches = {}
   for _, comment in ipairs(comments) do
-    local cursor_col = vim.api.nvim_win_get_cursor(0)[2] + 1
     local within_lines = not comment.line or (line >= (locate(comment) or 0) and line <= (comment.end_line or locate(comment)))
-    local within_columns = (line ~= comment.line or not comment.start_col or cursor_col >= comment.start_col)
-      and (line ~= comment.end_line or not comment.end_col or cursor_col <= comment.end_col)
-      and (comment.end_line ~= comment.line or not comment.end_col or cursor_col <= comment.end_col)
-    if comment.path == path and within_lines and within_columns then
+    if comment.path == path and within_lines then
       matches[#matches + 1] = comment
     end
   end
@@ -217,6 +213,20 @@ function M.add_comment(path, line, end_line, text, start_col, end_col)
   if buf ~= -1 and vim.api.nvim_buf_is_loaded(buf) then capture_anchor(comment, buf) end
   save()
   render_all()
+  local location = display_path(comment.path)
+  local first = locate(comment) or comment.line
+  if first then
+    location = location .. ':L' .. first
+    if comment.start_col then location = location .. ':C' .. comment.start_col end
+    if comment.end_line and comment.end_line > first then
+      location = location .. '-L' .. comment.end_line
+      if comment.end_col then location = location .. ':C' .. comment.end_col end
+    elseif comment.end_col and comment.end_col ~= comment.start_col then
+      location = location .. '-L' .. first .. ':C' .. comment.end_col
+    end
+  end
+  vim.fn.setreg('+', location .. '\\n' .. comment.text)
+  notify('Comment saved and copied to system clipboard')
 end
 
 function M.remove_comment(comment)
