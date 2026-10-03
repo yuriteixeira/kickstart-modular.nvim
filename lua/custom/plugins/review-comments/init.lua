@@ -7,7 +7,12 @@ command('ReviewCommentAdd', function(opts)
   if opts.args == 'file' then
     action('add') 'file'
   elseif opts.range > 0 then
-    action('add')('line', opts.line1, opts.line2)
+    local start_col, end_col
+    if vim.fn.visualmode() ~= 'V' then
+      start_col = vim.fn.col("'<")
+      end_col = vim.fn.col("'>")
+    end
+    action('add')('line', opts.line1, opts.line2, start_col, end_col)
   else
     action('add') 'line'
   end

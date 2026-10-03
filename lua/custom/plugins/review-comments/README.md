@@ -7,7 +7,7 @@ Add comments to files in Neovim and collect them in a review session. Open a fil
 | Action | Keys | Command |
 | --- | --- | --- |
 | Comment on the current line | `<leader>rc` | `:ReviewCommentAdd` |
-| Comment on a visual selection | Select lines, then `<leader>rc` | `:'<,'>ReviewCommentAdd` |
+| Comment on a visual selection | Select text or lines, then `<leader>rc` | `:'<,'>ReviewCommentAdd` |
 | Comment on the current file | `<leader>rC` | `:ReviewCommentAdd file` |
 | Edit a comment at the cursor | `<leader>re` | `:ReviewCommentEdit` |
 | Delete a comment at the cursor | `<leader>rd` | `:ReviewCommentDelete` |

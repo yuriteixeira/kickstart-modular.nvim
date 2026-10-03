@@ -153,7 +153,12 @@ local function review_at_cursor()
   local line = vim.api.nvim_win_get_cursor(0)[1]
   local matches = {}
   for _, comment in ipairs(comments) do
-    if comment.path == path and (not comment.line or (line >= (locate(comment) or 0) and line <= (comment.end_line or locate(comment)))) then
+    local cursor_col = vim.api.nvim_win_get_cursor(0)[2] + 1
+    local within_lines = not comment.line or (line >= (locate(comment) or 0) and line <= (comment.end_line or locate(comment)))
+    local within_columns = (line ~= comment.line or not comment.start_col or cursor_col >= comment.start_col)
+      and (line ~= comment.end_line or not comment.end_col or cursor_col <= comment.end_col)
+      and (comment.end_line ~= comment.line or not comment.end_col or cursor_col <= comment.end_col)
+    if comment.path == path and within_lines and within_columns then
       matches[#matches + 1] = comment
     end
   end
@@ -167,15 +172,19 @@ local function choose_here(callback)
   vim.ui.select(matches, { prompt = 'Choose review comment', format_item = function(item) return item.text end }, callback)
 end
 
-local function dialog_title(line, end_line)
+local function dialog_title(line, end_line, start_col, end_col)
   local location = 'Comment'
   if line then
-    location = end_line and end_line > line and ('Comment on Range ' .. line .. '-' .. end_line) or ('Comment on Line ' .. line)
+    local first = tostring(line) .. (start_col and ':' .. start_col or '')
+    local last_line = end_line or line
+    local last = tostring(last_line) .. (end_col and ':' .. end_col or '')
+    local is_range = last_line > line or (end_col ~= nil and end_col > (start_col or 0))
+    location = is_range and ('Comment on Range ' .. first .. '-' .. last) or ('Comment on Line ' .. first)
   end
   return ' ' .. location .. '  (Ctrl-S save, q cancel) '
 end
 
-local function editor(initial, line, end_line, on_save)
+local function editor(initial, line, end_line, start_col, end_col, on_save)
   local buf = vim.api.nvim_create_buf(false, true)
   vim.bo[buf].bufhidden = 'wipe'
   vim.bo[buf].filetype = 'markdown'
@@ -186,7 +195,7 @@ local function editor(initial, line, end_line, on_save)
     relative = 'editor', style = 'minimal', border = 'rounded',
     width = width, height = height,
     row = math.floor((vim.o.lines - height) / 2), col = math.floor((vim.o.columns - width) / 2),
-    title = dialog_title(line, end_line),
+    title = dialog_title(line, end_line, start_col, end_col),
   })
   vim.keymap.set({ 'n', 'i' }, '<C-s>', function()
     local text = vim.trim(table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), '\n'))
@@ -196,10 +205,11 @@ local function editor(initial, line, end_line, on_save)
   vim.keymap.set('n', 'q', function() vim.api.nvim_win_close(win, true) end, { buffer = buf })
 end
 
-function M.add_comment(path, line, end_line, text)
+function M.add_comment(path, line, end_line, text, start_col, end_col)
   next_id = next_id + 1
   comments[#comments + 1] = {
     id = next_id, path = path, line = line, end_line = end_line,
+    start_col = start_col, end_col = end_col,
     commit = commit_for(path, line), text = text,
   }
   local comment = comments[#comments]
