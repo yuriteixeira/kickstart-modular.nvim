@@ -225,7 +225,10 @@ function M.add_comment(path, line, end_line, text, start_col, end_col)
       location = location .. '-L' .. first .. ':C' .. comment.end_col
     end
   end
-  vim.fn.setreg('+', location .. '\\n' .. comment.text)
+  local text = comment.text:gsub('\n', '\n   ')
+  local prefix = '`' .. location .. '`'
+  if comment.commit then prefix = prefix .. ' (commit ' .. comment.commit .. ')' end
+  vim.fn.setreg('+', prefix .. ' - ' .. text)
   notify('Comment saved and copied to system clipboard')
 end
 

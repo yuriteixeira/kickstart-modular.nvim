@@ -17,6 +17,11 @@ local function anchor(comment)
   return result
 end
 
+local function format_comment(comment)
+  local parts = vim.split(comment.text, '\n', { plain = true })
+  return '`' .. anchor(comment) .. '` - ' .. table.concat(parts, '\n   ')
+end
+
 return function()
   state.sync_lines()
   local lines = {
@@ -24,11 +29,11 @@ return function()
     'Address my following comments:', '',
   }
   for index, comment in ipairs(state.comments) do
-    local prefix = index .. '. `' .. anchor(comment) .. '`'
-    if comment.commit then prefix = prefix .. ' (commit ' .. comment.commit .. ')' end
-    local parts = vim.split(comment.text, '\n', { plain = true })
-    lines[#lines + 1] = prefix .. ' - ' .. parts[1]
-    for part = 2, #parts do lines[#lines + 1] = '   ' .. parts[part] end
+    local formatted = format_comment(comment)
+    if comment.commit then formatted = formatted:gsub(' - ', ' (commit ' .. comment.commit .. ') - ', 1) end
+    local parts = vim.split(formatted, '\n', { plain = true })
+    lines[#lines + 1] = index .. '. ' .. parts[1]
+    for part = 2, #parts do lines[#lines + 1] = parts[part] end
   end
   return table.concat(lines, '\n') .. '\n'
 end
