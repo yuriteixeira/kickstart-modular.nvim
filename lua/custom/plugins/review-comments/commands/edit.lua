@@ -5,7 +5,12 @@ return function()
     if not comment then return end
     state.sync_lines()
     state.editor(comment.text, state.locate(comment), comment.end_line, function(text)
-      state.update_comment(comment, text)
+      text = vim.trim(text)
+      if text == '' then
+        state.remove_comment(comment)
+      else
+        state.update_comment(comment, text)
+      end
     end)
   end)
 end

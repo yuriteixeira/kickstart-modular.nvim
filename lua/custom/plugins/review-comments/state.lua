@@ -190,7 +190,6 @@ local function editor(initial, line, end_line, on_save)
   })
   vim.keymap.set({ 'n', 'i' }, '<C-s>', function()
     local text = vim.trim(table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), '\n'))
-    if text == '' then return notify('Comment cannot be empty', vim.log.levels.WARN) end
     vim.api.nvim_win_close(win, true)
     on_save(text)
   end, { buffer = buf })
