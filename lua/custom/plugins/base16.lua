@@ -9,9 +9,12 @@ local function gh(repo) return 'https://github.com/' .. repo end
 
 vim.pack.add { gh 'RRethy/base16-nvim' }
 
-local fallback_theme = 'atelier-lakeside'
-local shell_theme = vim.env.BASE16_THEME
-local theme = (shell_theme and shell_theme ~= '') and shell_theme or fallback_theme
+local palette, err = require('custom.helpers.base16-palette').read(vim.fn.expand '~/.base16_theme')
+if not palette then
+  vim.cmd.colorscheme('default')
+  vim.notify(err, vim.log.levels.WARN)
+  return
+end
 
 require('base16-colorscheme').with_config {
   telescope = true,
@@ -27,9 +30,5 @@ require('base16-colorscheme').with_config {
   diffview = true,
 }
 
-local ok = pcall(vim.cmd.colorscheme, 'base16-' .. theme)
-
-if not ok then
-  vim.notify(('base16 theme %q is not available; falling back to %q'):format(theme, fallback_theme), vim.log.levels.WARN)
-  vim.cmd.colorscheme('base16-' .. fallback_theme)
-end
+require('base16-colorscheme').setup(palette)
+vim.g.colors_name = 'base16-system'
