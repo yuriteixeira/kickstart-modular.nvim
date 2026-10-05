@@ -9,13 +9,6 @@ local function gh(repo) return 'https://github.com/' .. repo end
 
 vim.pack.add { gh 'RRethy/base16-nvim' }
 
-local palette, err = require('custom.helpers.base16-palette').read(vim.fn.expand '~/.base16_theme')
-if not palette then
-  vim.cmd.colorscheme('default')
-  vim.notify(err, vim.log.levels.WARN)
-  return
-end
-
 require('base16-colorscheme').with_config {
   telescope = true,
   telescope_borders = true,
@@ -30,5 +23,15 @@ require('base16-colorscheme').with_config {
   diffview = true,
 }
 
-require('base16-colorscheme').setup(palette)
-vim.g.colors_name = 'base16-system'
+-- Make the personal colors directory available to :colorscheme.
+local custom_path = vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':h:h')
+vim.opt.runtimepath:prepend(custom_path)
+vim.cmd.colorscheme 'base16-system'
+
+local group = vim.api.nvim_create_augroup('custom-base16-system', { clear = true })
+vim.api.nvim_create_autocmd('FocusGained', {
+  group = group,
+  nested = true,
+  callback = require('custom.helpers.base16-system').refresh,
+  desc = 'Reload the system Base16 palette when it changes',
+})

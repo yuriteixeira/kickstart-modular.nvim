@@ -1,12 +1,19 @@
 -- Highlight's tweaking
 local terminal = require 'custom.helpers.terminal'
 
-if terminal.is_graphical then
-  -- Transparent Bg
-  -- TODO: Convert to Neovim's Lua API calls (like we see below)
+local function apply_transparency()
+  if not terminal.is_graphical then return end
   vim.cmd [[ highlight Normal guibg=none ctermbg=none ]]
   vim.cmd [[ highlight NonText guibg=none ctermbg=none ]]
 end
+
+local transparency_group = vim.api.nvim_create_augroup('custom-transparent-background', { clear = true })
+vim.api.nvim_create_autocmd('ColorScheme', {
+  group = transparency_group,
+  callback = apply_transparency,
+  desc = 'Keep the background transparent after a theme change',
+})
+apply_transparency()
 
 local function apply_spell_highlight()
   local style = {

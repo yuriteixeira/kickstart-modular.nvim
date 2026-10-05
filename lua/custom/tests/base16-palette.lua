@@ -44,4 +44,55 @@ assert(normal.bg == tonumber(palette.base00:sub(2), 16))
 assert(normal.ctermbg == palette.cterm00)
 assert(vim.g.colors_name == 'base16-system')
 
+-- Simulate replacing the system theme symlink without changing the real theme.
+local original_read = reader.read
+local system_path = vim.fn.expand '~/.base16_theme'
+local theme_link = vim.fn.tempname()
+local first_theme = vim.fn.tempname()
+local second_theme = vim.fn.tempname()
+vim.fn.writefile(lines, first_theme)
+local changed_lines = vim.deepcopy(lines)
+changed_lines[1] = 'color00="ff/ee/dd"'
+vim.fn.writefile(changed_lines, second_theme)
+assert(vim.uv.fs_symlink(first_theme, theme_link))
+
+reader.read = function(theme_path)
+  return original_read(theme_path == system_path and theme_link or theme_path)
+end
+
+vim.cmd.colorscheme 'base16-system'
+assert(vim.api.nvim_get_hl(0, { name = 'Normal' }).bg == 0x00abcd)
+assert(vim.uv.fs_unlink(theme_link))
+assert(vim.uv.fs_symlink(second_theme, theme_link))
+vim.api.nvim_exec_autocmds('FocusGained', {})
+assert(vim.api.nvim_get_hl(0, { name = 'Normal' }).bg == 0xffeedd)
+assert(require('base16-colorscheme').colors.base00 == '#ffeedd')
+
+-- Do not reset highlights when the palette has not changed.
+vim.api.nvim_set_hl(0, 'Normal', { bg = '#123456' })
+vim.api.nvim_exec_autocmds('FocusGained', {})
+assert(vim.api.nvim_get_hl(0, { name = 'Normal' }).bg == 0x123456)
+vim.cmd.colorscheme 'base16-system'
+assert(vim.api.nvim_get_hl(0, { name = 'Normal' }).bg == 0xffeedd)
+
+-- Keep transparency after an explicit reload or a focus change.
+require 'custom.overrides.ui'
+assert(vim.api.nvim_get_hl(0, { name = 'Normal' }).bg == nil)
+vim.cmd.colorscheme 'base16-system'
+assert(vim.api.nvim_get_hl(0, { name = 'Normal' }).bg == nil)
+assert(vim.uv.fs_unlink(theme_link))
+assert(vim.uv.fs_symlink(first_theme, theme_link))
+vim.api.nvim_exec_autocmds('FocusGained', {})
+assert(require('base16-colorscheme').colors.base00 == '#00abcd')
+assert(vim.api.nvim_get_hl(0, { name = 'Normal' }).bg == nil)
+
+-- A focus change must not replace a different colorscheme.
+vim.cmd.colorscheme 'default'
+vim.api.nvim_exec_autocmds('FocusGained', {})
+assert(vim.g.colors_name == 'default')
+
+reader.read = original_read
+vim.fn.delete(theme_link)
+vim.fn.delete(first_theme)
+vim.fn.delete(second_theme)
 print('Base16 palette tests passed')
