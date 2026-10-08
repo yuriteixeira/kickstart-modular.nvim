@@ -3,6 +3,12 @@ local builtin = require 'telescope.builtin'
 
 local default_mark_entry_maker
 
+local function preview_height(picker, _, height)
+  local spacing = picker.window.border == false and 2 or 6
+  local content_height = height - spacing - 1
+  return math.max(1, math.floor(content_height * 0.8))
+end
+
 local function mark_entry_maker(entry)
   local mark = entry.line and entry.line:match '^(%a)' or nil
   if mark then return default_mark_entry_maker(entry) end
@@ -60,6 +66,15 @@ end
 
 telescope.setup {
   defaults = {
+    layout_strategy = 'vertical',
+    layout_config = {
+      vertical = {
+        mirror = true,
+        prompt_position = 'top',
+        preview_cutoff = 0,
+        preview_height = preview_height,
+      },
+    },
     vimgrep_arguments = {
       'rg',
       '--color=never',
