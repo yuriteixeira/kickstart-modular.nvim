@@ -1,6 +1,7 @@
 local telescope = require 'telescope'
 local builtin = require 'telescope.builtin'
 local actions = require 'telescope.actions'
+local action_state = require 'telescope.actions.state'
 
 local default_mark_entry_maker
 
@@ -20,10 +21,30 @@ local function find_marks()
   builtin.marks { entry_maker = mark_entry_maker }
 end
 
+local function toggle_grep_case(prompt_bufnr)
+  local picker = action_state.get_current_picker(prompt_bufnr)
+  local prompt = action_state.get_current_line()
+  local case_prefix = '(?-i)'
+  local mode
+
+  if prompt:sub(1, #case_prefix) == case_prefix then
+    prompt = prompt:sub(#case_prefix + 1)
+    mode = 'Smart case'
+  else
+    prompt = case_prefix .. prompt
+    mode = 'Case sensitive'
+  end
+
+  local title = picker.prompt_title:gsub(' %[Smart case%]$', ''):gsub(' %[Case sensitive%]$', '')
+  picker.prompt_title = title .. ' [' .. mode .. ']'
+  if picker.prompt_border then picker.prompt_border:change_title(picker.prompt_title) end
+  picker:reset_prompt(prompt)
+end
+
 local function find_open_files()
   builtin.live_grep {
     grep_open_files = true,
-    prompt_title = 'Live Grep in Open Files',
+    prompt_title = 'Live Grep in Open Files [Smart case]',
   }
 end
 
@@ -100,6 +121,13 @@ telescope.setup {
     },
   },
   pickers = {
+    live_grep = {
+      prompt_title = 'Live Grep [Smart case]',
+      mappings = {
+        i = { ['<C-t>'] = toggle_grep_case },
+        n = { ['<C-t>'] = toggle_grep_case },
+      },
+    },
     find_files = {
       find_command = { 'rg', '--files', '--hidden', '--glob', '!.git/' },
     },
