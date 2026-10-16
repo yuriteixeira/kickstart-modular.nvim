@@ -68,8 +68,14 @@ end
 telescope.setup {
   defaults = {
     mappings = {
-      i = { ['<C-a>'] = actions.toggle_all },
-      n = { ['<C-a>'] = actions.toggle_all },
+      i = {
+        ['<C-a>'] = actions.toggle_all,
+        ['<C-q>'] = actions.send_selected_to_qflist + actions.open_qflist,
+      },
+      n = {
+        ['<C-a>'] = actions.toggle_all,
+        ['<C-q>'] = actions.send_selected_to_qflist + actions.open_qflist,
+      },
     },
     layout_strategy = 'vertical',
     layout_config = {
