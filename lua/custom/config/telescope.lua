@@ -1,5 +1,6 @@
 local telescope = require 'telescope'
 local builtin = require 'telescope.builtin'
+local actions = require 'telescope.actions'
 
 local default_mark_entry_maker
 
@@ -66,6 +67,10 @@ end
 
 telescope.setup {
   defaults = {
+    mappings = {
+      i = { ['<C-a>'] = actions.toggle_all },
+      n = { ['<C-a>'] = actions.toggle_all },
+    },
     layout_strategy = 'vertical',
     layout_config = {
       vertical = {
